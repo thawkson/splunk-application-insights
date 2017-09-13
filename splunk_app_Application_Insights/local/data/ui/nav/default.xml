@@ -1,0 +1,16 @@
+<nav search_view="search" color="#65A637">
+  <view name="overview" default="true"  />
+  <view name="triage" />  
+  <view name="load_balancers" />  
+  <view name="web_servers" />  
+  <view name="app_servers" />  
+  <view name="operating_systems" />
+
+  <collection label="Search &amp; Reporting...">  
+  	<view name="search" />
+  	<view name="datasets" />
+  	<view name="reports" />
+  	<view name="alerts" />
+  	<view name="dashboards" />
+  </collection>
+</nav>

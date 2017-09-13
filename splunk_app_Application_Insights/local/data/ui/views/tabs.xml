@@ -1,0 +1,150 @@
+<form script="tabs.js" stylesheet="tabs.css">
+  <label>Tabs</label>
+  <fieldset submitButton="false">
+    <input type="time" token="myTime">
+      <label>Time Period</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="app_domain" searchWhenChanged="true">
+      <label>Application Domains</label>
+    </input>
+  </fieldset>
+
+
+  <row id="tabs">
+	   <panel>
+	      <html>
+	         <ul id="tabs" class="nav nav-tabs">
+                  <li class="active">
+                        <a href="#" class="toggle-tab" data-toggle="tab" data-elements="web_sites,stuff">Web Servers</a>
+                   </li>
+		              <li>
+			                  <a href="#" class="toggle-tab" data-toggle="tab" data-elements="others">Other Stuff</a>
+		              </li>
+		       </ul>
+	      </html>
+	   </panel>
+	</row>
+
+
+ <row id="web_sites">
+  <panel>
+    <html>
+    Let's make this dashboard look like the OI demo
+    </html>
+  </panel>
+</row>
+
+
+<row id="stuff">
+    <panel>
+            <table>
+              <title>Web Sites</title>
+              <search>
+                <query>site=$site$ tag=web tag=activity web_server=$web_server$
+      
+      | eval 4xx=if(status &gt;= 400 AND status &lt; 500, status, null()), 5xx=if(status &gt;= 500, status, null()) 
+      | stats count(_raw) as "Requests", count(4xx) as "4xx", count(5xx) as "5xx",  avg(response_time) as "Avg. Response Time (ms)" by site 
+      | addinfo 
+      | eval hits_per_minute=((Requests)/(info_max_time - info_min_time))*60  
+      | rename hits_per_minute as "Requests Per Minute" 
+      | fields + site, "Requests", "4xx", "5xx", "Requests Per Minute", "Avg. Response Time (ms)"</query>
+                <earliest>$myTime.earliest$</earliest>
+                <latest>$myTime.latest$</latest>
+              </search>
+              <option name="dataOverlayMode">none</option>
+              <option name="drilldown">cell</option>
+              <option name="percentagesRow">false</option>
+              <option name="rowNumbers">false</option>
+              <option name="totalsRow">false</option>
+              <option name="wrap">true</option>
+            </table>
+          </panel>
+          <panel>
+            <table>
+              <title>Top 10 Slowest URI Queries</title>
+              <search>
+                <query>site=$site$ web_server=$web_server$ tag=web tag=activity | rename response_time as "Response Time (ms)" | stats max("Response Time (ms)") as "Response Time (ms)" by uri_path | sort limit=10 -"Response Time (ms)"</query>
+                <earliest>$myTime.earliest$</earliest>
+                <latest>$myTime.latest$</latest>
+              </search>
+            </table>
+          </panel>
+ </row>
+
+
+
+
+  <row id="others">
+    <panel>
+      <chart>
+        <title>Hits Per Minute (count)</title>
+        <search>
+          <query>site=$site$ web_server=$web_server$ tag=web tag=activity | timechart count(_raw) as "Hits Per Minute"</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.data.count">0</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Total Response Codes (2xx, 3xx, 4xx, 5xx)</title>
+        <search>
+          <query>site=$site$ web_server=$web_server$ tag=web tag=activity | eval 2xx=if(status &gt;= 200 AND status &lt; 300, status, null()), 3xx=if(status &gt;= 300 AND status &lt; 400, status, null()), 4xx=if(status &gt;= 400 AND status &lt; 500, status, null()), 5xx=if(status &gt;= 500 AND status &lt; 600, status, null()) | stats count as Total, count(2xx) as 2xx, count(3xx) as 3xx, count(4xx) as 4xx, count(5xx) as 5xx</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.data.count">0</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

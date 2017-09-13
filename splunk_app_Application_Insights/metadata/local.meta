@@ -1,0 +1,83 @@
+[nav/default]
+version = 6.5.2
+modtime = 1504810865.242610000
+
+[views/overview]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = admin
+version = 6.5.2
+modtime = 1504647883.879945000
+
+[views/web_servers]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = admin
+version = 6.5.2
+modtime = 1504729519.395489000
+
+[panels/test-panel]
+owner = admin
+version = 6.5.2
+modtime = 1503513098.989084000
+
+[panels/test]
+owner = admin
+version = 6.5.2
+modtime = 1503513941.868804000
+
+[panels/aaa]
+owner = admin
+version = 6.5.2
+modtime = 1503516182.076739000
+
+[panels/xxx]
+owner = admin
+version = 6.5.2
+modtime = 1503517542.412810000
+
+[views/app_servers]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = admin
+version = 6.5.2
+modtime = 1504728917.514782000
+
+[views/databases]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = admin
+version = 6.5.2
+modtime = 1504113852.435118000
+
+[views/operating_systems]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = admin
+version = 6.5.2
+modtime = 1504729736.424477000
+
+[panels/qqq]
+owner = admin
+version = 6.5.2
+modtime = 1503575634.109010000
+
+[views/oi]
+owner = admin
+version = 6.5.2
+modtime = 1504116577.453649000
+
+[views/load_balancers]
+owner = admin
+version = 6.5.2
+modtime = 1504728967.050637000
+
+[views/tabs]
+owner = admin
+version = 6.5.2
+modtime = 1504647122.840182000
+
+[views/triage]
+owner = admin
+version = 6.5.2
+modtime = 1504819075.610658000

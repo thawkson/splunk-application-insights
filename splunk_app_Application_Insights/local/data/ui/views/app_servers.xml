@@ -1,0 +1,339 @@
+<form>
+  <label>Application Servers</label>
+  <description>Insight into the performance of your application servers</description>
+  <fieldset submitButton="false">
+    <input type="time" token="myTime" searchWhenChanged="true">
+      <label>Time Period</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="application_server" searchWhenChanged="true">
+      <label>App Servers</label>
+      <fieldForLabel>application_server</fieldForLabel>
+      <fieldForValue>application_server</fieldForValue>
+      <search>
+        <query>tag=appserver tag=performance  | dedup application_server | table application_server</query>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </search>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Active Sessions</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=session  
+     application_server="$application_server$" 
+
+| timechart avg(active_sessions_count) as "Active Sessions"
+
+| predict "Active Sessions" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Requests per Minute</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+application_server="$application_server$" 
+
+| timechart avg(request_count) as "Requests per Minute"
+
+| predict "Requests per Minute" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Average Transaction Response Time (ms)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+application_server="$application_server$" 
+
+| timechart avg(response_time) as "Average Transaction Response Time (ms)"
+
+| predict"Average Transaction Response Time (ms)" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Response Codes (2xx, 3xx, 4xx, 5xx)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+ 
+
+| rangemap field=response_code 2xx=200-299 3xx=300-399 4xx=400-499 5xx=500-599 
+
+| search range = * AND NOT(range="None") 
+
+| timechart count(range) by range</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">top</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Memory Heap Free (%)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+application_server="$application_server$" 
+
+| timechart avg(memory_heap_free_percent) as "Memory Heap Free (%)"
+
+| predict"Memory Heap Free (%)" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Memory Heap Used (MB)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+application_server="$application_server$" 
+
+| timechart avg(memory_heap_size) as "Memory Heap Size (MB)", avg(memory_heap_used) as "Memory Heap Used (MB)"</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Garbage Collections (count)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+
+application_server="$application_server$" 
+
+| timechart avg(garbage_collection_count) as "Garbage Collections (count)"</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Garbage Collection Time (ms)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+application_server="$application_server$" 
+
+| timechart avg(garbage_collection_time) as "Garbage Collection Time (ms)"</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Available Threads Count (%)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+application_server="$application_server$" 
+
+| timechart avg(available_threads_count_percent) as "Available Threads (%)"
+
+| predict"Available Threads (%)" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Active Threads</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+application_server="$application_server$" 
+
+| eval generated_active_threads_count=if(thread_state="active",1,0)
+
+| eval active_threads = coalesce(generated_active_threads_count, currentThreadsBusy)
+
+| timechart avg(active_threads) as "Active Threads"
+
+| predict "Active Threads" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Hung Threads (count)</title>
+        <search>
+          <query>tag=appserver  
+tag=performance 
+tag=runtime  
+application_server="$application_server$" 
+
+| eval generated_hung_threads_count=if(thread_state="hung",1,0)
+
+| eval hung_threads_count = coalesce(generated_hung_threads_count, hung_threads_count)
+
+| timechart avg(hung_threads_count) as "Hung Threads"
+
+| predict"Hung Threads" future_timespan=30</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.time.visible">false</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top 10 Requested URLs</title>
+        <search>
+          <query>tag=appserver   tag=performance | top limit=10 request_uri</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <event>
+        <title>Last 10 Log Entries</title>
+        <search>
+          <query>tag=appserver   
+
+limit=10</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+      </event>
+    </panel>
+  </row>
+</form>
