@@ -1,102 +1,7 @@
-<form script="oi_it_ops_visibility.js, tokenlinks.js" stylesheet="oi_it_ops_visibility.css, custom_decorations.css">
-  <label>IT Operations Visibility</label>
-  <init>
-    <set token="end2end">show</set>
-  </init>
-  <search id="oi_demo_access_combined">
-    <query>index=oidemo sourcetype=access_combined | bin _time span=1m | stats count avg(bytes) as bytes avg(timetaken) as timetaken by src, status, status_description, _time</query>
-    <earliest>$selection.earliest$</earliest>
-    <latest>$selection.latest$</latest>
-    <refresh>$refresh_token$</refresh>
-    <refreshType>delay</refreshType>
-  </search>
-  <search id="storage">
-    <query>index=oidemo sourcetype=storage:perf | bin _time span=1m | eval host = if(host="storage_appserver-01","appserver_storage",if(host="storage_db-01","db_storage",if(host="storage_exchange-03","exchange_storage",if(host="storage_webserver-02","webserver_storage",host)))) | stats avg(read_ops) as read_ops avg(write_ops) as write_ops by host _time</query>
-    <earliest>$selection.earliest$</earliest>
-    <latest>$selection.latest$</latest>
-    <refresh>$refresh_token$</refresh>
-    <refreshType>delay</refreshType>
-  </search>
-  <search id="cpu_mem">
-    <query>index=oidemo sourcetype=vmstat2 | bin _time span=1m | stats avg(loadAvg1mi) as load avg(memUsedPct) AS mem by src _time</query>
-    <earliest>$selection.earliest$</earliest>
-    <latest>$selection.latest$</latest>
-    <refresh>$refresh_token$</refresh>
-    <refreshType>delay</refreshType>
-  </search>
-  <search id="mysql">
-    <query>index=oidemo sourcetype="stream:mysql" | bin _time span=1m | stats avg(time_taken) as time_taken by user query _time</query>
-    <earliest>$selection.earliest$</earliest>
-    <latest>$selection.latest$</latest>
-    <refresh>$refresh_token$</refresh>
-    <refreshType>delay</refreshType>
-  </search>
-  <!-- Single Value Searches -->
-  <search>
-    <query>| stats count as value | eval value = 23 | rangemap field=value none=0-1 low=2-40 guarded=41-99 elevated=100-399 high=400-499 severe=500-599 default=none</query>
-    <preview>
-      <set token="value1">$result.value$</set>
-      <set token="range1">$result.range$</set>
-    </preview>
-  </search>
-  <search base="storage">
-    <query>| search host="db_storage" | timechart span=1m partial=f avg(read_ops) as value | eval value=value/1000000 | search value&gt;0 | sort - _time | head 1 | rangemap field=value none=0-1 low=2-499 guarded=500-799 elevated=800-999 high=1000-1799 severe=1800-2599 default=none</query>
-    <preview>
-      <set token="value2">$result.value$</set>
-      <set token="range2">$result.range$</set>
-    </preview>
-  </search>
-  <search base="cpu_mem">
-    <query>| search src="mysql-02" | timechart span=1m partial=f avg(load) as value | sort - _time | search value&gt;0 | rangemap field=value low=0-8 elevated=9-28 high=29-49 severe=50-100 default=none</query>
-    <preview>
-      <set token="value3">$result.value$</set>
-      <set token="range3">$result.range$</set>
-    </preview>
-  </search>
-  <search>
-    <query>| stats count as value | eval value = 23 | rangemap field=value none=0-1 low=2-40 guarded=41-99 elevated=100-399 high=400-499 severe=500-599 default=none</query>
-    <preview>
-      <set token="value4">$result.value$</set>
-      <set token="range4">$result.range$</set>
-    </preview>
-  </search>
-  <search base="oi_demo_access_combined">
-    <query>| search status=503 | timechart span=1m partial=f sum(count) as value | search value&gt;0 | sort - _time | head 1 | rangemap field=value none=0-1 low=2-20 guarded=21-22 elevated=23-26 high=27-29 severe=30-599 default=none</query>
-    <preview>
-      <set token="value5">$result.value$</set>
-      <set token="range5">$result.range$</set>
-    </preview>
-  </search>
-  <search>
-    <query>| stats count as value | eval value = 23 | rangemap field=value none=0-1 low=2-40 guarded=41-99 elevated=100-399 high=400-499 severe=500-599 default=none</query>
-    <preview>
-      <set token="value6">$result.value$</set>
-      <set token="range6">$result.range$</set>
-    </preview>
-  </search>
-  <search base="oi_demo_access_combined">
-    <query>| search status=503 | timechart span=1m partial=f sum(count) as value | search value&gt;0 | sort - _time | head 1 | rangemap field=value none=0-1 low=2-20 guarded=21-22 elevated=23-66 high=67-89 severe=90-599 default=none</query>
-    <preview>
-      <set token="value7">$result.value$</set>
-      <set token="range7">$result.range$</set>
-    </preview>
-  </search>
-  <search>
-    <query>| stats count as value | eval value = 23 | rangemap field=value none=0-1 low=2-40 guarded=41-99 elevated=100-399 high=400-499 severe=500-599 default=none</query>
-    <preview>
-      <set token="value8">$result.value$</set>
-      <set token="range8">$result.range$</set>
-    </preview>
-  </search>
-  <search base="mysql">
-    <query>| eval db_duration=time_taken/2 | timechart span=1m partial=f avg(db_duration) as db_duration | eval value=round(db_duration)  | search value&gt;0 | sort - _time | head 1 | rangemap field=value none=0-1 low=2-199 guarded=200-449 elevated=550-799 high=800-2999 severe=3000-10000 default=none</query>
-    <preview>
-      <set token="value9">$result.value$</set>
-      <set token="range9">$result.range$</set>
-    </preview>
-  </search>
+<form>
+  <label>Overview</label>
   <fieldset submitButton="false">
-    <input type="time" token="field1" searchWhenChanged="true">
+    <input type="time" token="myTime" searchWhenChanged="true">
       <label>Select a Time Range:</label>
       <default>
         <earliest>-60m@m</earliest>
@@ -113,8 +18,8 @@
       <default>0</default>
       <initialValue>0</initialValue>
     </input>
-    <input type="link" token="field2" searchWhenChanged="true">
-      <label>Event Timerange Picker</label>
+    <input type="link" token="timerange" searchWhenChanged="true">
+      <label>Time Range Picker</label>
       <choice value="show">Show</choice>
       <choice value="hide">Hide</choice>
       <change>
@@ -127,32 +32,118 @@
           <unset token="showTimeline"></unset>
         </condition>
       </change>
+      <default>show</default>
+      <initialValue>show</initialValue>
     </input>
   </fieldset>
   <row>
     <panel>
-      <chart depends="$showTimeline$">
-        <title>End2End Transaction Time</title>
+      <title>Timeline</title>
+      <chart>
         <search>
-          <query>index=oidemo sourcetype=access_combined OR sourcetype=stream:mysql
-| eval timetakenapp=timetaken/30 
-| eval timetakenweb=timetaken/25 
-| eval timetakendb=time_taken/2
-| timechart span=2m avg(timetakendb) as db_duration avg(timetakenweb) as web_duration avg(timetakenapp) as app_duration</query>
-          <earliest>$field1.earliest$</earliest>
-          <latest>$field1.latest$</latest>
+          <query>* | timechart count</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
         </search>
-        <selection>
-          <set token="selection.earliest">$start$</set>
-          <set token="selection.latest">$end$</set>
-        </selection>
-        <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.axisTitleY.visibility">collapsed</option>
         <option name="charting.chart">area</option>
-        <option name="charting.drilldown">none</option>
-        <option name="charting.legend.placement">none</option>
-        <option name="charting.seriesColors">[0xCCCCCC]</option>
-        <option name="height">160</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <center>
+        <table border="0" width="100%">
+          <tr>
+            <td width="33%" height="100px" align="center">
+                <a href="./load_balancers" target="_blank">
+                  <img src="/static/app/splunk_app_Application_Insights/load-balancer-1.png" style="width:100px%;height:100px;"/>
+                  <br/>
+                  <strong>Load Balancers</strong> 
+                </a>
+            </td>
+            <td width="33%" align="center">
+              <a href="./web_servers" target="_blank">
+                <img src="/static/app/splunk_app_Application_Insights/web-server.png" style="width:100px;height:100px;"/>
+                <br/>
+                <strong>Web Servers</strong> 
+                </a>
+            </td>
+            <td width="33%" align="center">
+              <a href="./app_servers" target="_blank">  
+                <img src="/static/app/splunk_app_Application_Insights/application-server.png" style="width:100px;height:100px;"/>
+                <br/>
+                <strong>Application Servers</strong> 
+                </a>
+            </td>
+          </tr>
+        </table>
+      </center>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>need separate charts for Performance / Errors / Traffic</title>
+      <chart>
+        <search>
+          <query>* | timechart count</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Web Server1</title>
+      <chart>
+        <search>
+          <query>* | timechart count</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>App Server1</title>
+      <chart>
+        <search>
+          <query>* | timechart count</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <center>
+        <table border="3" width="100%">
+          <tr>
+            <td width="100%" align="center">
+                <img src="/static/app/splunk_app_Application_Insights/operating-systems.png" style="width:300px;height:100px;"/>
+                <br/>
+                <strong>Operating Systems</strong> 
+            </td>
+          </tr>
+        </table>
+      </center>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>OS 1</title>
+      <chart>
+        <search>
+          <query>* | timechart count</query>
+          <earliest>$myTime.earliest$</earliest>
+          <latest>$myTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
       </chart>
     </panel>
   </row>

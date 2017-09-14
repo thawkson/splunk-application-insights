@@ -1,8 +1,7 @@
 <form>
-  <label>Insightful Triage</label>
+  <label>Triage</label>
   <description>When something goes wrong, how do you find the root cause? Find a lot of similar events and look at what preceeded them.</description>
   <!--   style="z-index:-1" -->
-  <!--   HowTo Modal Dialog -->
   <!-- -->
   <fieldset submitButton="false" autoRun="false">
     <input type="time" token="myTime" searchWhenChanged="true">
@@ -75,14 +74,13 @@
         <h3>
           <i class="icn-easy icon-modal-medium icon-color-easy m-right"/>Triage using Patterns and Time Sequence
         </h3>
-        <description style="clear:both;">When someting goes wrong, how do you find the root cause?  Most will assemble all the experts to compare notes and timestamps using their favorite tools (a.k.a. 'The War Room').  This dashboard helps to automate that process, here's how:<br/>
+        <description style="clear:both;">When someting goes wrong, how do you find the root cause?  Most will assemble all the experts to compare notes and timestamps using their favorite tools (a.k.a. 'The War Room').  This dashboard helps to automate that process and here's how to use it:<br/>
           <br/>
         <ol>
           <li>Look for high occurrences of events with similar patterns in the table below</li>
           <li>Look at the events that PRECEDED those groupings</li>
           <li>Refine if needed to remove noise or isolate individual hosts or sources.  Consider adding more search terms or excluding them using the NOT option</li>
         </ol>
-        <br/>
           <br/>
         You'll be on your way to root cause identification in no time.  The more data you add to Splunk, the more correlations you will see.  
         </description>
@@ -90,7 +88,7 @@
       <html id="btn_element7">
         <div class="btn-group1">
           <div>
-            <a class="btn full" href="javascript:();" data-toggle="modal" data-target="#info">How this works...<i class="icon-question-circle icon-modal-medium icon-color-easy m-left"/>
+            <a class="btn full" href="javascript:();" data-toggle="modal" data-target="#info">More on how this works...<i class="icon-question-circle icon-modal-medium icon-color-easy m-left"/>
             </a>
           </div>
         </div>
@@ -111,7 +109,7 @@ NOT success* OR NOT INFO OR NOT WARN $terms$
           <earliest>$myTime.earliest$</earliest>
           <latest>$myTime.latest$</latest>
         </search>
-        <option name="count">45</option>
+        <option name="count">30</option>
         <option name="dataOverlayMode">heatmap</option>
         <option name="drilldown">cell</option>
         <option name="percentagesRow">false</option>
@@ -123,11 +121,8 @@ NOT success* OR NOT INFO OR NOT WARN $terms$
   </row>
   <row id="howto">
     <panel>
-      <!-- spgt:0101916: begin modal container element:feedback -->
-      <html> <div id="info" class="modal fade"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h4 class="modal-title"> <i class="icn-easy draggable icon-modal-medium icon-color-easy m-right"/>The Easy Triage: How to use. </h4> <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> </button> </div> <div class="modal-body p-10"> <div class="hdr-spgt-modal">This panel contains information about and instructions for the <strong>Triage</strong> dashboard.
-      <br/>
-      <br/>
-      This dashboard illustrates how easily and quickly you can find <strong>root cause </strong>of application issues, operations issues, security, and enterprise faults. By having the appropriate data in Splunk, whether defined or undefined, structured or unstructured, you can use the power of _time, a simple search, and a function to show correlations across yoru many data sources related by time. This is the holy grail of finding collateral damage (symptoms of the problem) as well as the true root cause in an overwhelming sea of data. The key is to have the data sources present. If you don't have the data you don't have the whole picture. JUST GET THE DATA IN. Splunk is the word.
+      <html> <div id="info" class="modal fade" style="display: none;"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h4 class="modal-title"> <i class="icn-easy draggable icon-modal-medium icon-color-easy m-right"/>Triage: How it works</h4> <button type="button" class="close" data-dismiss="modal" aria-hidden="false"> </button> </div> <div class="modal-body p-10"> 
+      This dashboard illustrates how easily and quickly you can find <strong>root cause </strong>of application issues, operations issues, security, and enterprise faults. By having the appropriate data in Splunk, whether defined or undefined, structured or unstructured, you can use the power of _time, a simple search, and a function to show correlations across yoru many data sources related by time. This is the holy grail of finding collateral damage (symptoms of the problem) as well as the true root cause in an overwhelming sea of data. The key is to have the data sources present. If you don't have the data you don't have the whole picture. JUST GET THE DATA IN. 
       <br/>
       <br/>
         <strong>Instructions</strong>
@@ -141,7 +136,7 @@ NOT success* OR NOT INFO OR NOT WARN $terms$
 <code>host=(choices) index=(choices) sourcetype=(choices) (crit* OR fail* OR fatal OR except* OR err* OR status &gt; 499) NOT success* OR NOT INFO OR NOT WARN (choices-text input) | cluster showcount=t | rename _raw as "Event Audit Trail" cluster_count as "#" sourcetype as Sourcetype host as Host | table _time Host Sourcetype "Event Audit Trail" # | sort -_time </code>
         </pre>
       <br/>
-       <br/> </div> </div> </div> </div> </div> </html>
+       <br/>  </div> </div> </div> </div> </html>
     </panel>
   </row>
 </form>
