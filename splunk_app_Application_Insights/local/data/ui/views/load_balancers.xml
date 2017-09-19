@@ -260,11 +260,11 @@ tag=network
           <query>tag=loadbalancer 
 tag=performance 
 tag=network  
-pool="$pool$" 
+
 
 pool=* (NOT node=*) 
 | stats latest(avl_status_string) as "Latest Availability" by pool 
-| join type=left pool [search host="$host$" tag=loadbalancer tag=performance tag=network tag=loadbalancer_web 
+| join type=left pool [search tag=loadbalancer tag=performance tag=network tag=loadbalancer_web 
 
 | stats count as "Connections", avg(rtt) as "Round Trip Time (ms)", values(node) as "Members", dc(node) as "Member Count" by pool 
 
@@ -290,7 +290,7 @@ node=* (NOT pool=*)
 
 | stats latest(avl_status_string) as "Latest Availability" by node 
 
-| join type=left node [search host="$host$" tag=loadbalancer tag=performance tag=network tag=loadbalancer_web 
+| join type=left node [search  tag=loadbalancer tag=performance tag=network tag=loadbalancer_web 
 
 | stats count as "Connections", avg(rtt) as "Round Trip Time (ms)", count(eval(response_code &gt;= 400 AND response_code &lt; 500)) as "4xx Errors", count(eval(response_code &gt;= 500 AND response_code &lt; 600)) as "5xx Errors" by node, pool] 
 
